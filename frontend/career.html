@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Career Planner</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron&family=Poppins&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #ffe3e3, #cce5ff);
+      min-height: 100vh;
+      color: #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      padding: 40px 20px;
+    }
+
+    .glass-container {
+      max-width: 700px;
+      background: linear-gradient(135deg, #fdfbfb, #ebedee);
+      padding: 40px;
+      border-radius: 20px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      text-align: center;
+      font-size: 2em;
+      margin-bottom: 30px;
+      color: #444;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    input[type="text"], select, textarea {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+      background: #ffffff;
+      color: #333;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    .checkbox-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .checkbox-header button {
+      background-color: #eee;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .checkbox-header button:hover {
+      background-color: #d8e8ff;
+    }
+
+    .checkbox-box {
+      border: 1px solid #ccc;
+      padding: 10px 15px;
+      border-radius: 8px;
+      background-color: #f7f7f7;
+      margin-bottom: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 10px;
+    }
+
+    .checkbox-box label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.95rem;
+    }
+
+    button[type="submit"] {
+      background: linear-gradient(to right, #ffd6e0, #b8e1ff);
+      color: #222;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+      width: 100%;
+    }
+
+    button[type="submit"]:hover {
+      transform: scale(1.03);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .result {
+      margin-top: 30px;
+      background-color: #f3f3f3;
+      padding: 20px;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      display: none;
+      animation: fadeIn 0.8s ease-in-out forwards;
+      color: #444;
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(10px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="glass-container">
+    <h1>🌸 AI Career Planner</h1>
+    <form id="careerForm">
+
+      <div class="checkbox-header">
+        <label>Strengths:</label>
+        <div>
+          <button type="button" id="checkAll">Check All</button>
+          <button type="button" id="clearAll">Clear All</button>
+        </div>
+      </div>
+
+      <div class="checkbox-box" id="checkboxGroup">
+        <label><input type="checkbox" value="Mathematics" /> Mathematics</label>
+        <label><input type="checkbox" value="Logical Reasoning" /> Logical Reasoning</label>
+        <label><input type="checkbox" value="Creative Thinking" /> Creative Thinking</label>
+        <label><input type="checkbox" value="Data Analysis" /> Data Analysis</label>
+        <label><input type="checkbox" value="Communication" /> Communication</label>
+        <label><input type="checkbox" value="Problem Solving" /> Problem Solving</label>
+      </div>
+
+      <label for="style">Preferred Work Style:</label>
+      <select id="style" required>
+        <option value="">Select</option>
+        <option value="individual">Individual Contributor</option>
+        <option value="team">Team Collaboration</option>
+        <option value="research">Research & Development</option>
+      </select>
+
+      <label for="dream">Dream Job Description (optional):</label>
+      <textarea id="dream" rows="3" placeholder="Describe your ideal role..."></textarea>
+
+      <button type="submit">✨ Find My Career Path</button>
+    </form>
+
+    <div class="result" id="careerResult">
+      <h3>🔮 Suggested Career Path:</h3>
+      <p id="careerSuggestion"></p>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById("careerForm");
+    const resultBox = document.getElementById("careerResult");
+    const suggestion = document.getElementById("careerSuggestion");
+    const checkboxGroup = document.querySelectorAll("#checkboxGroup input[type='checkbox']");
+    const checkAllBtn = document.getElementById("checkAll");
+    const clearAllBtn = document.getElementById("clearAll");
+
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const selectedStrengths = Array.from(checkboxGroup)
+                                     .filter(cb => cb.checked)
+                                     .map(cb => cb.value.toLowerCase());
+      const style = document.getElementById("style").value;
+
+      let output = "Based on your profile, we suggest roles like: ";
+
+      if (selectedStrengths.includes("data analysis") || selectedStrengths.includes("mathematics")) {
+        output += "📊 Data Scientist, ";
+      }
+      if (selectedStrengths.includes("creative thinking") && style === "team") {
+        output += "🎯 AI Product Manager, ";
+      }
+      if (selectedStrengths.includes("logical reasoning") && style === "individual") {
+        output += "🤖 Machine Learning Engineer, ";
+      }
+      if (selectedStrengths.includes("problem solving") && style === "research") {
+        output += "🧠 AI Research Scientist, ";
+      }
+      if (selectedStrengths.includes("communication") && style === "team") {
+        output += "📢 AI Consultant, ";
+      }
+
+      suggestion.textContent = output.replace(/, $/, ".");
+      resultBox.style.display = "block";
+    });
+
+    // Check All / Clear All Functionality
+    checkAllBtn.addEventListener("click", () => {
+      checkboxGroup.forEach(cb => cb.checked = true);
+    });
+
+    clearAllBtn.addEventListener("click", () => {
+      checkboxGroup.forEach(cb => cb.checked = false);
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Geographic AI Trends</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      overflow-x: hidden; /* prevent horizontal scroll */
+    }
+
+    #map {
+      height: 100vh;
+      width: 100%;
+    }
+
+    .leaflet-popup-content {
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .popup-title {
+      font-weight: bold;
+      color: #d00000;
+    }
+  </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+  const map = L.map('map').setView([20, 0], 2); // centered globally
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors',
+    noWrap: true,
+    bounds: [[-90, -180], [90, 180]] // constrain map to world bounds
+  }).addTo(map);
+
+  const places = [
+    { city: "San Francisco", coords: [37.7749, -122.4194], trend: "AI Product Managers, Computer Vision, Robotics" },
+    { city: "New York", coords: [40.7128, -74.0060], trend: "Data Scientists, NLP, AI Ethics" },
+    { city: "Toronto", coords: [43.6510, -79.3470], trend: "AI Researchers, Chatbot Development" },
+    { city: "London", coords: [51.5074, -0.1278], trend: "AI in Finance, ML Engineers" },
+    { city: "Berlin", coords: [52.52, 13.405], trend: "ML Startups, AI Governance" },
+    { city: "Paris", coords: [48.8566, 2.3522], trend: "AI in Fashion, AI Developers" },
+    { city: "Bangalore", coords: [12.9716, 77.5946], trend: "ML Engineers, AI in Healthcare" },
+    { city: "Hyderabad", coords: [17.3850, 78.4867], trend: "Data Engineering, AI Cloud Solutions" },
+    { city: "Beijing", coords: [39.9042, 116.4074], trend: "AI Infrastructure, Government-backed AI" },
+    { city: "Shanghai", coords: [31.2304, 121.4737], trend: "AI Startups, Computer Vision" },
+    { city: "Tokyo", coords: [35.6762, 139.6503], trend: "Robotics, Edge AI" },
+    { city: "Seoul", coords: [37.5665, 126.9780], trend: "AI Hardware, Autonomous Cars" },
+    { city: "Singapore", coords: [1.3521, 103.8198], trend: "AI in Finance, AI Policy" },
+    { city: "Dubai", coords: [25.276987, 55.296249], trend: "Smart City AI, NLP Roles" },
+    { city: "Sydney", coords: [-33.8688, 151.2093], trend: "AI Researchers, Climate AI" },
+    { city: "São Paulo", coords: [-23.5505, -46.6333], trend: "AI in Retail, ML Analysts" },
+    { city: "Johannesburg", coords: [-26.2041, 28.0473], trend: "AI in Agriculture, ML Developers" },
+    { city: "Nairobi", coords: [-1.2921, 36.8219], trend: "AI for Social Good, Research Roles" },
+    { city: "Moscow", coords: [55.7558, 37.6173], trend: "AI Surveillance, Defense AI" },
+    { city: "Stockholm", coords: [59.3293, 18.0686], trend: "Ethical AI, Sustainable AI Dev" }
+  ];
+
+  // Add red markers with popups
+  places.forEach(place => {
+    const marker = L.circleMarker(place.coords, {
+      color: 'red',
+      fillColor: '#ff4d4d',
+      fillOpacity: 0.8,
+      radius: 7
+    }).addTo(map);
+
+    marker.bindPopup(`
+      <div>
+        <div class="popup-title">${place.city}</div>
+        <div>🔍 <strong>Trending Roles:</strong><br>${place.trend}</div>
+      </div>
+    `);
+  });
+</script>
+
+</body>
+</html>
