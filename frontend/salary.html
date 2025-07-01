@@ -124,23 +124,25 @@
       <label>Job Title:</label>
       <input type="text" name="job_title" id="jobTitle" required />
 
-      <label>Experience Level:</label>
-      <select name="experience_level" id="experienceLevel" required>
-        <option value="">Select Level</option>
-        <option value="Entry-Level">Entry-Level</option>
-        <option value="Mid-Level">Mid-Level</option>
-        <option value="Senior-Level">Senior-Level</option>
-        <option value="Executive">Executive</option>
-      </select>
+ <label>Experience Level:</label>
+<select name="experience_level" id="experienceLevel" required>
+  <option value="">Select Level</option>
+  <option value="EN">Entry-Level</option>
+  <option value="MI">Mid-Level</option>
+  <option value="SE">Senior-Level</option>
+  <option value="EX">Executive</option>
+</select>
 
-      <label>Employment Type:</label>
-      <select name="employment_type" id="employmentType" required>
-        <option value="">Select Type</option>
-        <option value="Full-Time">Full-Time</option>
-        <option value="Part-Time">Part-Time</option>
-        <option value="Contract">Contract</option>
-        <option value="Internship">Internship</option>
-      </select>
+
+<label>Employment Type:</label>
+<select name="employment_type" id="employmentType" required>
+  <option value="">Select Type</option>
+  <option value="FT">Full-Time</option>
+  <option value="PT">Part-Time</option>
+  <option value="CT">Contract</option>
+  <option value="IN">Internship</option>
+</select>
+
 
       <label>Company Location:</label>
       <input type="text" name="company_location" id="companyLocation" placeholder="e.g., USA, India" required />
@@ -164,59 +166,58 @@
     <div class="result" id="result" style="display: none;">
       💸 Expected Salary: <span id="salaryOutput"></span> / year
     </div>
+
+
   </div>
 
   <!-- JavaScript Logic -->
-  <script>
-    document.getElementById("salaryForm").addEventListener("submit", function(e) {
-      e.preventDefault();
+<script>
+document.getElementById("salaryForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
 
-      const jobTitle = document.getElementById("jobTitle").value.toLowerCase();
-      const expLevel = document.getElementById("experienceLevel").value;
-      const employmentType = document.getElementById("employmentType").value;
-      const location = document.getElementById("companyLocation").value.trim().toLowerCase();
-      const remoteRatio = parseInt(document.getElementById("remoteRatio").value);
-      const yearsExp = parseInt(document.getElementById("yearsExperience").value);
-      const benefitsScore = parseFloat(document.getElementById("benefitsScore").value || 0);
+  const jobTitle = document.getElementById("jobTitle").value;
+  const experienceLevel = document.getElementById("experienceLevel").value;
+  const employmentType = document.getElementById("employmentType").value;
+  const companyLocation = document.getElementById("companyLocation").value;
+  const remoteRatio = parseInt(document.getElementById("remoteRatio").value);
+  const yearsExperience = parseFloat(document.getElementById("yearsExperience").value);
+  const benefitsScore = parseFloat(document.getElementById("benefitsScore").value || 0);
 
-      // Base salary mock values
-      let baseSalary = 80000;
+const payload = {
+  job_title: jobTitle,
+  experience_level: experienceLevel,
+  employment_type: employmentType,
+  company_location: companyLocation,
+  remote_ratio: remoteRatio,
+  years_experience: yearsExperience,
+  benefits_score: benefitsScore
+};
 
-      // Adjustments
-      const locationFactor = {
-        usa: 1.3,
-        india: 0.6,
-        germany: 1.1,
-        uk: 1.2,
-        canada: 1.0,
-        default: 0.85
-      };
 
-      const experienceFactor = {
-        "Entry-Level": 1.0,
-        "Mid-Level": 1.3,
-        "Senior-Level": 1.6,
-        "Executive": 2.0
-      };
-
-      const employmentFactor = {
-        "Full-Time": 1.0,
-        "Part-Time": 0.7,
-        "Contract": 0.9,
-        "Internship": 0.4
-      };
-
-      const regionMultiplier = locationFactor[location] || locationFactor["default"];
-      const expMultiplier = experienceFactor[expLevel] || 1.0;
-      const empMultiplier = employmentFactor[employmentType] || 1.0;
-
-      // Final predicted salary
-      const predicted = baseSalary * regionMultiplier * expMultiplier * empMultiplier * (1 + (yearsExp * 0.03)) * (1 + benefitsScore * 0.1) * (1 + remoteRatio / 200);
-
-      document.getElementById("salaryOutput").textContent = Math.round(predicted).toLocaleString("en-US") + " USD";
-      document.getElementById("result").style.display = "block";
+  try {
+    const response = await fetch("http://127.0.0.1:5000/predict", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
     });
-  </script>
+    const result = await response.json();
+
+if (response.ok && result.predicted_salary !== undefined) {
+  document.getElementById("salaryOutput").textContent =
+    result.predicted_salary.toLocaleString("en-US") + " USD";
+  document.getElementById("result").style.display = "block";
+} else {
+  throw new Error(result.error || "Unknown error occurred");
+}
+
+
+  } catch (err) {
+    alert("Prediction failed. Please check backend or console.");
+    console.error(err);
+  }
+});
+</script>
+
 
 </body>
 </html>
