@@ -109,3 +109,5 @@ if not rules.empty:
     rules = rules.drop_duplicates(subset='consequents')  # avoid duplicates
 else:
     st.warning("⚠️ No strong rules found. Try relaxing filters or increasing dataset.")
+
+    
