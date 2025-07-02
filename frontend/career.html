@@ -49,7 +49,7 @@
       color: #333;
     }
 
-    input[type="text"], select, textarea {
+    input[type="number"], select {
       width: 100%;
       padding: 12px;
       margin-bottom: 20px;
@@ -58,49 +58,6 @@
       font-size: 1rem;
       background: #ffffff;
       color: #333;
-    }
-
-    textarea {
-      resize: vertical;
-    }
-
-    .checkbox-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-
-    .checkbox-header button {
-      background-color: #eee;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      padding: 5px 10px;
-      font-size: 0.9rem;
-      cursor: pointer;
-      transition: background 0.2s ease;
-    }
-
-    .checkbox-header button:hover {
-      background-color: #d8e8ff;
-    }
-
-    .checkbox-box {
-      border: 1px solid #ccc;
-      padding: 10px 15px;
-      border-radius: 8px;
-      background-color: #f7f7f7;
-      margin-bottom: 20px;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 10px;
-    }
-
-    .checkbox-box label {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.95rem;
     }
 
     button[type="submit"] {
@@ -132,6 +89,14 @@
       color: #444;
     }
 
+    .career-card {
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+
     @keyframes fadeIn {
       0% { opacity: 0; transform: translateY(10px); }
       100% { opacity: 1; transform: translateY(0); }
@@ -144,89 +109,104 @@
     <h1>🌸 AI Career Planner</h1>
     <form id="careerForm">
 
-      <div class="checkbox-header">
-        <label>Strengths:</label>
-        <div>
-          <button type="button" id="checkAll">Check All</button>
-          <button type="button" id="clearAll">Clear All</button>
-        </div>
-      </div>
+      <label for="salary">Expected Salary (USD):</label>
+      <input type="number" id="salary" required placeholder="e.g. 95000" />
 
-      <div class="checkbox-box" id="checkboxGroup">
-        <label><input type="checkbox" value="Mathematics" /> Mathematics</label>
-        <label><input type="checkbox" value="Logical Reasoning" /> Logical Reasoning</label>
-        <label><input type="checkbox" value="Creative Thinking" /> Creative Thinking</label>
-        <label><input type="checkbox" value="Data Analysis" /> Data Analysis</label>
-        <label><input type="checkbox" value="Communication" /> Communication</label>
-        <label><input type="checkbox" value="Problem Solving" /> Problem Solving</label>
-      </div>
+      <label for="experience">Years of Experience:</label>
+      <input type="number" id="experience" required placeholder="e.g. 4" />
 
-      <label for="style">Preferred Work Style:</label>
-      <select id="style" required>
+      <label for="company">Company Size:</label>
+      <select id="company" required>
         <option value="">Select</option>
-        <option value="individual">Individual Contributor</option>
-        <option value="team">Team Collaboration</option>
-        <option value="research">Research & Development</option>
+        <option value="S">Small</option>
+        <option value="M">Medium</option>
+        <option value="L">Large</option>
       </select>
 
-      <label for="dream">Dream Job Description (optional):</label>
-      <textarea id="dream" rows="3" placeholder="Describe your ideal role..."></textarea>
+      <label for="education">Education Level:</label>
+      <select id="education" required>
+        <option value="">Select</option>
+        <option value="Bachelor's Degree">Bachelor's Degree</option>
+        <option value="Master's Degree">Master's Degree</option>
+        <option value="PhD">PhD</option>
+      </select>
 
-      <button type="submit">✨ Find My Career Path</button>
+      <button type="submit">✨ Predict My Career</button>
     </form>
 
     <div class="result" id="careerResult">
-      <h3>🔮 Suggested Career Path:</h3>
-      <p id="careerSuggestion"></p>
+      <h3>🔮 Top Career Suggestions:</h3>
+      <div id="careerCards"></div>
+
+      <div style="margin-top: 30px;">
+        <h4>🧠 What does "Confidence" mean?</h4>
+        <p>Confidence shows how strongly the AI recommends a career. The higher the value, the more aligned your profile is with the role.</p>
+
+        <h4>📈 Interpretation:</h4>
+        <ul>
+          <li><strong>90%+</strong>: Excellent Fit</li>
+          <li><strong>70–89%</strong>: Good Fit</li>
+          <li><strong>&lt;70%</strong>: Explore Carefully</li>
+        </ul>
+      </div>
     </div>
   </div>
 
   <script>
     const form = document.getElementById("careerForm");
     const resultBox = document.getElementById("careerResult");
-    const suggestion = document.getElementById("careerSuggestion");
-    const checkboxGroup = document.querySelectorAll("#checkboxGroup input[type='checkbox']");
-    const checkAllBtn = document.getElementById("checkAll");
-    const clearAllBtn = document.getElementById("clearAll");
+    const cardsContainer = document.getElementById("careerCards");
 
-    form.addEventListener("submit", function(e) {
+    form.addEventListener("submit", async function(e) {
       e.preventDefault();
 
-      const selectedStrengths = Array.from(checkboxGroup)
-                                     .filter(cb => cb.checked)
-                                     .map(cb => cb.value.toLowerCase());
-      const style = document.getElementById("style").value;
+      const salary = parseFloat(document.getElementById("salary").value);
+      const experience = parseFloat(document.getElementById("experience").value);
+      const companySize = document.getElementById("company").value;
+      const education = document.getElementById("education").value;
 
-      let output = "Based on your profile, we suggest roles like: ";
+      const payload = {
+        salary_usd: salary,
+        years_experience: experience,
+        company_size: companySize,
+        education_required: education
+      };
 
-      if (selectedStrengths.includes("data analysis") || selectedStrengths.includes("mathematics")) {
-        output += "📊 Data Scientist, ";
-      }
-      if (selectedStrengths.includes("creative thinking") && style === "team") {
-        output += "🎯 AI Product Manager, ";
-      }
-      if (selectedStrengths.includes("logical reasoning") && style === "individual") {
-        output += "🤖 Machine Learning Engineer, ";
-      }
-      if (selectedStrengths.includes("problem solving") && style === "research") {
-        output += "🧠 AI Research Scientist, ";
-      }
-      if (selectedStrengths.includes("communication") && style === "team") {
-        output += "📢 AI Consultant, ";
-      }
+      try {
+        const response = await fetch("http://127.0.0.1:5000/predict-career", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
 
-      suggestion.textContent = output.replace(/, $/, ".");
-      resultBox.style.display = "block";
+        const result = await response.json();
+        if (!result.success) throw new Error(result.error);
+
+        cardsContainer.innerHTML = "";
+
+        result.predictions.forEach(pred => {
+          const card = document.createElement("div");
+          card.className = "career-card";
+          card.innerHTML = `
+            <h4>${pred.career}</h4>
+            <p><strong>Confidence:</strong> ${pred.confidence}%</p>
+            <p>${getConfidenceMeaning(pred.confidence)}</p>
+          `;
+          cardsContainer.appendChild(card);
+        });
+
+        resultBox.style.display = "block";
+      } catch (err) {
+        alert("Error: " + err.message);
+        console.error(err);
+      }
     });
 
-    // Check All / Clear All Functionality
-    checkAllBtn.addEventListener("click", () => {
-      checkboxGroup.forEach(cb => cb.checked = true);
-    });
-
-    clearAllBtn.addEventListener("click", () => {
-      checkboxGroup.forEach(cb => cb.checked = false);
-    });
+    function getConfidenceMeaning(conf) {
+      if (conf >= 90) return "🌟 Excellent match for you!";
+      if (conf >= 70) return "✅ Good fit for your profile.";
+      return "⚠️ Worth exploring with caution.";
+    }
   </script>
 
 </body>
