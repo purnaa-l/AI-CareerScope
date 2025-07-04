@@ -153,3 +153,12 @@ st.markdown("## 📁 Export Results")
 st.download_button("📥 Download Clustered Data", df.to_csv(index=False), file_name="ai_job_clusters.csv")
 
 st.markdown("#### AI Career Scope")
+background_style = """
+<style>
+.stApp {
+    background-image: url("https://images.unsplash.com/photo-1533497197926-c9e810dcea9a?q=80&w=1037&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
+    background-size: cover;
+}
+</style>
+"""
+st.markdown(background_style, unsafe_allow_html=True)
